@@ -21,7 +21,7 @@ local Window = Library:CreateWindow({
 	Center = true,
 	AutoShow = true,
 	Resizable = true,
-	ShowCustomCursor = true,
+	ShowCustomCursor = false,
 	TabPadding = 8,
 	MenuFadeTime = 0.2
 })
