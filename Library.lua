@@ -98,12 +98,12 @@ end));
 
 local function GetPlayersString()
     local PlayerList = Players:GetPlayers();
-
+    table.sort(PlayerList, function(str1, str2) return str1 < str2 end);
     for i = 1, #PlayerList do
         PlayerList[i] = PlayerList[i].Name;
     end;
 
-    table.sort(PlayerList, function(str1, str2) return str1 < str2 end);
+
 
     return PlayerList;
 end;
@@ -4230,7 +4230,7 @@ function Library:CreateWindow(...)
             Size = UDim2.new(1, -4, 1, 0);
             BackgroundTransparency = 1;
             Font = Library.Font;
-            Text = "  显示/隐藏";
+            Text = " 显示/隐藏";
             TextColor3 = Library.FontColor;
             TextSize = 14;
             TextXAlignment = Enum.TextXAlignment.Left;
@@ -4300,7 +4300,7 @@ function Library:CreateWindow(...)
             Size = UDim2.new(1, -4, 1, 0);
             BackgroundTransparency = 1;
             Font = Library.Font;
-            Text = "   锁定 UI";
+            Text = "  锁定UI";
             TextColor3 = Library.FontColor;
             TextSize = 14;
             TextXAlignment = Enum.TextXAlignment.Left;
