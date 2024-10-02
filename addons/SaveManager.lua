@@ -115,7 +115,7 @@ local SaveManager = {} do
 
 	function SaveManager:Save(name)
 		if (not name) then
-			return false, 'no config file is selected'
+			return false, '未选择配置文件'
 		end
 		SaveManager:CheckFolderTree()
 		
@@ -139,7 +139,7 @@ local SaveManager = {} do
 
 		local success, encoded = pcall(httpService.JSONEncode, httpService, data)
 		if not success then
-			return false, 'failed to encode data'
+			return false, '无法对数据进行编码'
 		end
 
 		writefile(fullPath, encoded)
@@ -148,15 +148,15 @@ local SaveManager = {} do
 
 	function SaveManager:Load(name)
 		if (not name) then
-			return false, 'no config file is selected'
+			return false, '未选择配置文件'
 		end
 		SaveManager:CheckFolderTree()
 		
 		local file = self.Folder .. '/settings/' .. name .. '.json'
-		if not isfile(file) then return false, 'invalid file' end
+		if not isfile(file) then return false, '无效文件' end
 
 		local success, decoded = pcall(httpService.JSONDecode, httpService, readfile(file))
-		if not success then return false, 'decode error' end
+		if not success then return false, '解码错误' end
 
 		for _, option in next, decoded.objects do
 			if self.Parser[option.type] then
@@ -169,14 +169,14 @@ local SaveManager = {} do
 
 	function SaveManager:Delete(name)
 		if (not name) then
-			return false, 'no config file is selected'
+			return false, '未选择配置文件'
 		end
 		
 		local file = self.Folder .. '/settings/' .. name .. '.json'
-		if not isfile(file) then return false, 'invalid file' end
+		if not isfile(file) then return false, '无效文件' end
 
 		local success, decoded = pcall(delfile, file)
-		if not success then return false, 'delete file error' end
+		if not success then return false, '删除文件错误' end
 		
 		return true
 	end
@@ -244,10 +244,10 @@ local SaveManager = {} do
 
 			local success, err = self:Load(name)
 			if not success then
-				return self.Library:Notify('Failed to load autoload config: ' .. err)
+				return self.Library:Notify('加载自动加载配置失败:' .. err)
 			end
 
-			self.Library:Notify(string.format('Auto loaded config %q', name))
+			self.Library:Notify(string.format('自动加载的配置:%q', name))
 		end
 	end
 
@@ -255,22 +255,22 @@ local SaveManager = {} do
 	function SaveManager:BuildConfigSection(tab)
 		assert(self.Library, 'Must set SaveManager.Library')
 
-		local section = tab:AddRightGroupbox('Configuration')
+		local section = tab:AddRightGroupbox('配置')
 
-		section:AddInput('SaveManager_ConfigName',    { Text = 'Config name' })
-		section:AddButton('Create config', function()
+		section:AddInput('SaveManager_ConfigName',    { Text = '配置名称' })
+		section:AddButton('创建配置', function()
 			local name = getgenv().Linoria.Options.SaveManager_ConfigName.Value
 
 			if name:gsub(' ', '') == '' then 
-				return self.Library:Notify('Invalid config name (empty)', 2)
+				return self.Library:Notify('无效的配置名称:(empty)', 2)
 			end
 
 			local success, err = self:Save(name)
 			if not success then
-				return self.Library:Notify('Failed to create config: ' .. err)
+				return self.Library:Notify('无法创建配置:' .. err)
 			end
 
-			self.Library:Notify(string.format('Created config %q', name))
+			self.Library:Notify(string.format('成功创建配置:%q', name))
 
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValue(nil)
@@ -278,67 +278,67 @@ local SaveManager = {} do
 
 		section:AddDivider()
 
-		section:AddDropdown('SaveManager_ConfigList', { Text = 'Config list', Values = self:RefreshConfigList(), AllowNull = true })
-		section:AddButton('Load config', function()
+		section:AddDropdown('SaveManager_ConfigList', { Text = '配置列表', Values = self:RefreshConfigList(), AllowNull = true })
+		section:AddButton('加载配置', function()
 			local name = getgenv().Linoria.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Load(name)
 			if not success then
-				return self.Library:Notify('Failed to load config: ' .. err)
+				return self.Library:Notify('加载配置失败:' .. err)
 			end
 
-			self.Library:Notify(string.format('Loaded config %q', name))
+			self.Library:Notify(string.format('加载的配置:%q', name))
 		end)
-		section:AddButton('Overwrite config', function()
+		section:AddButton('覆盖配置', function()
 			local name = getgenv().Linoria.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Save(name)
 			if not success then
-				return self.Library:Notify('Failed to overwrite config: ' .. err)
+				return self.Library:Notify('覆盖配置失败:' .. err)
 			end
 
-			self.Library:Notify(string.format('Overwrote config %q', name))
+			self.Library:Notify(string.format('覆盖的配置:%q', name))
 		end)
 		
-		section:AddButton('Delete config', function()
+		section:AddButton('删除配置', function()
 			local name = getgenv().Linoria.Options.SaveManager_ConfigList.Value
 
 			local success, err = self:Delete(name)
 			if not success then
-				return self.Library:Notify('Failed to delete config: ' .. err)
+				return self.Library:Notify('删除配置失败:' .. err)
 			end
 
-			self.Library:Notify(string.format('Deleted config %q', name))
+			self.Library:Notify(string.format('删除的配置:%q', name))
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
-		section:AddButton('Refresh list', function()
+		section:AddButton('刷新列表', function()
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValues(self:RefreshConfigList())
 			getgenv().Linoria.Options.SaveManager_ConfigList:SetValue(nil)
 		end)
 
-		section:AddButton('Set as autoload', function()
+		section:AddButton('设置为自动加载', function()
 			local name = getgenv().Linoria.Options.SaveManager_ConfigList.Value
 			writefile(self.Folder .. '/settings/autoload.txt', name)
-			SaveManager.AutoloadLabel:SetText('Current autoload config: ' .. name)
-			self.Library:Notify(string.format('Set %q to auto load', name))
+			SaveManager.AutoloadLabel:SetText('当前自动加载配置:' .. name)
+			self.Library:Notify(string.format('将 %q 设置为自动加载', name))
 		end)
-		section:AddButton('Reset autoload', function()
+		section:AddButton('重置自动加载', function()
 			local success = pcall(delfile, self.Folder .. '/settings/autoload.txt')
 			if not success then 
-				return self.Library:Notify('Failed to reset autoload: delete file error')
+				return self.Library:Notify('重置自动加载失败:删除文件错误')
 			end
 				
-			self.Library:Notify('Set autoload to none')
-			SaveManager.AutoloadLabel:SetText('Current autoload config: none')
+			self.Library:Notify('将无设置为自动加载')
+			SaveManager.AutoloadLabel:SetText('当前自动加载配置:无')
 		end)
 
-		SaveManager.AutoloadLabel = section:AddLabel('Current autoload config: none', true)
+		SaveManager.AutoloadLabel = section:AddLabel('当前自动加载配置:无', true)
 
 		if isfile(self.Folder .. '/settings/autoload.txt') then
 			local name = readfile(self.Folder .. '/settings/autoload.txt')
-			SaveManager.AutoloadLabel:SetText('Current autoload config: ' .. name)
+			SaveManager.AutoloadLabel:SetText('当前自动加载配置:' .. name)
 		end
 
 		SaveManager:SetIgnoreIndexes({ 'SaveManager_ConfigList', 'SaveManager_ConfigName' })
