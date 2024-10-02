@@ -262,7 +262,7 @@ local SaveManager = {} do
 			local name = getgenv().Linoria.Options.SaveManager_ConfigName.Value
 
 			if name:gsub(' ', '') == '' then 
-				return self.Library:Notify('无效的配置名称:(empty)', 2)
+				return self.Library:Notify('无效的配置名称', 2)
 			end
 
 			local success, err = self:Save(name)
