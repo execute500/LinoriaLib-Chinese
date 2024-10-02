@@ -330,7 +330,7 @@ local SaveManager = {} do
 				return self.Library:Notify('重置自动加载失败:删除文件错误')
 			end
 				
-			self.Library:Notify('将无设置为自动加载')
+			self.Library:Notify('将 无 设置为自动加载')
 			SaveManager.AutoloadLabel:SetText('当前自动加载配置:无')
 		end)
 
